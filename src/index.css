@@ -2,41 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Chemistry Lab Design System - Scientific and Engaging */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Lab Background Colors */
+    --background: 217 33% 95%;
+    --foreground: 217 33% 15%;
+    --lab-surface: 200 25% 90%;
+    
+    /* Scientific Blues and Teals */
+    --primary: 195 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 195 100% 65%;
+    
+    /* Lab Equipment Colors */
+    --secondary: 210 15% 85%;
+    --secondary-foreground: 217 33% 15%;
+    --equipment: 0 0% 95%;
+    --equipment-accent: 30 100% 85%;
+    
+    /* Chemical Reaction Colors */
+    --reaction-blue: 220 100% 60%;
+    --reaction-green: 120 100% 40%;
+    --reaction-red: 0 100% 60%;
+    --reaction-purple: 270 100% 60%;
+    --reaction-orange: 30 100% 60%;
+    --reaction-yellow: 60 100% 60%;
+    
+    /* Interactive Elements */
+    --accent: 195 100% 45%;
+    --accent-foreground: 0 0% 100%;
+    --hover-glow: 195 100% 65%;
+    
+    /* UI Elements */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 217 33% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --popover-foreground: 217 33% 15%;
+    --muted: 210 15% 92%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Status Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 120 100% 25%;
+    --success-foreground: 0 0% 100%;
+    --warning: 40 100% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Borders and Inputs */
+    --border: 210 15% 85%;
+    --input: 210 15% 92%;
+    --ring: 195 100% 45%;
+    
+    /* Glass and Liquid Effects */
+    --glass: 200 25% 95%;
+    --glass-highlight: 0 0% 100%;
+    --liquid-clear: 200 50% 85%;
+    --bubble: 200 100% 90%;
+    
+    /* Gradients */
+    --gradient-lab: linear-gradient(135deg, hsl(var(--background)), hsl(var(--lab-surface)));
+    --gradient-beaker: linear-gradient(145deg, hsl(var(--glass)), hsl(var(--glass-highlight)));
+    --gradient-reaction: linear-gradient(180deg, transparent, hsl(var(--reaction-blue) / 0.1));
+    --gradient-glow: radial-gradient(circle, hsl(var(--primary-glow) / 0.2), transparent);
+    
+    /* Shadows and Effects */
+    --shadow-equipment: 0 4px 12px hsl(217 33% 15% / 0.1);
+    --shadow-beaker: 0 8px 25px hsl(195 100% 25% / 0.15);
+    --shadow-reaction: 0 0 20px hsl(var(--primary-glow) / 0.4);
+    --glow-interactive: 0 0 15px hsl(var(--hover-glow) / 0.6);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --bubble-float: bubble-float 2s ease-in-out infinite;
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +144,117 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background: var(--gradient-lab);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Bubble Animation Keyframes */
+  @keyframes bubble-float {
+    0%, 100% { 
+      transform: translateY(0px) scale(1);
+      opacity: 0.8;
+    }
+    50% { 
+      transform: translateY(-20px) scale(1.1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes reaction-glow {
+    0%, 100% { 
+      box-shadow: 0 0 10px hsl(var(--primary-glow) / 0.3);
+    }
+    50% { 
+      box-shadow: var(--shadow-reaction);
+    }
+  }
+  
+  @keyframes gentle-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+
+  /* Lab Equipment Styles */
+  .lab-equipment {
+    @apply bg-equipment border-2 border-border rounded-xl p-4 cursor-grab;
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-105;
+    box-shadow: var(--shadow-equipment);
+  }
+  
+  .lab-equipment:hover {
+    box-shadow: var(--glow-interactive);
+  }
+  
+  .lab-equipment.dragging {
+    @apply cursor-grabbing scale-110 z-50;
+    box-shadow: var(--shadow-reaction);
+  }
+
+  /* Element Cards */
+  .element-card {
+    @apply bg-card border-2 border-border rounded-lg p-3 cursor-grab;
+    @apply transition-all duration-300 hover:bg-accent hover:text-accent-foreground;
+    box-shadow: var(--shadow-equipment);
+  }
+  
+  .element-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-interactive);
+  }
+
+  /* Beaker Styles */
+  .beaker-container {
+    @apply relative bg-glass rounded-b-full border-4 border-border;
+    background: var(--gradient-beaker);
+    box-shadow: var(--shadow-beaker);
+    transition: var(--transition-smooth);
+  }
+  
+  .beaker-liquid {
+    @apply absolute bottom-0 left-0 right-0 rounded-b-full;
+    transition: var(--transition-smooth);
+  }
+  
+  .beaker-bubbles {
+    @apply absolute inset-0 pointer-events-none;
+  }
+  
+  .bubble {
+    @apply absolute bg-bubble rounded-full;
+    animation: var(--bubble-float);
+  }
+
+  /* Reaction Effects */
+  .reacting {
+    animation: reaction-glow 1s ease-in-out infinite, gentle-shake 0.5s ease-in-out infinite;
+  }
+
+  /* Drop Zone Styles */
+  .drop-zone {
+    @apply border-2 border-dashed border-accent/50 rounded-xl;
+    transition: var(--transition-smooth);
+  }
+  
+  .drop-zone.active {
+    @apply border-accent bg-accent/10;
+    box-shadow: var(--glow-interactive);
+  }
+
+  /* Interactive Glow Effect */
+  .interactive-glow {
+    @apply transition-all duration-300;
+  }
+  
+  .interactive-glow:hover {
+    box-shadow: var(--glow-interactive);
+  }
+
+  /* Safety Warning Styles */
+  .safety-warning {
+    @apply bg-warning text-warning-foreground border-l-4 border-warning;
+    box-shadow: 0 4px 12px hsl(var(--warning) / 0.2);
   }
 }
