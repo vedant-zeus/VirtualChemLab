@@ -1,10 +1,29 @@
 import { useState } from "react";
-import { Search, Atom, Beaker } from "lucide-react";
+import { Search, Atom, Beaker, GraduationCap, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Element, Compound } from "../ChemistryLab";
+import { Badge } from "@/components/ui/badge";
+
+interface Element {
+  id: string;
+  symbol: string;
+  name: string;
+  atomicNumber: number;
+  category: string;
+  color: string;
+  grade?: string[];
+}
+
+interface Compound {
+  id: string;
+  formula: string;
+  name: string;
+  color: string;
+  type: string;
+  grade?: string[];
+}
 
 interface ElementLibraryProps {
   onAddElement: (element: Element) => void;
@@ -13,218 +32,267 @@ interface ElementLibraryProps {
 
 export const ElementLibrary = ({ onAddElement, onAddCompound }: ElementLibraryProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState<string>("all");
 
-  const elements: Element[] = [
-    // Period 1
-    { id: "h", symbol: "H", name: "Hydrogen", atomicNumber: 1, category: "nonmetal", color: "#ffffff" },
-    { id: "he", symbol: "He", name: "Helium", atomicNumber: 2, category: "noble gas", color: "#d9ffff" },
-    
-    // Period 2
-    { id: "li", symbol: "Li", name: "Lithium", atomicNumber: 3, category: "alkali metal", color: "#cc80ff" },
-    { id: "be", symbol: "Be", name: "Beryllium", atomicNumber: 4, category: "alkaline earth metal", color: "#c2ff00" },
-    { id: "b", symbol: "B", name: "Boron", atomicNumber: 5, category: "metalloid", color: "#ffb5b5" },
-    { id: "c", symbol: "C", name: "Carbon", atomicNumber: 6, category: "nonmetal", color: "#909090" },
-    { id: "n", symbol: "N", name: "Nitrogen", atomicNumber: 7, category: "nonmetal", color: "#3050f8" },
-    { id: "o", symbol: "O", name: "Oxygen", atomicNumber: 8, category: "nonmetal", color: "#ff0d0d" },
-    { id: "f", symbol: "F", name: "Fluorine", atomicNumber: 9, category: "halogen", color: "#90e050" },
-    { id: "ne", symbol: "Ne", name: "Neon", atomicNumber: 10, category: "noble gas", color: "#b3e3f5" },
-    
-    // Period 3
-    { id: "na", symbol: "Na", name: "Sodium", atomicNumber: 11, category: "alkali metal", color: "#ab5cf2" },
-    { id: "mg", symbol: "Mg", name: "Magnesium", atomicNumber: 12, category: "alkaline earth metal", color: "#8aff00" },
-    { id: "al", symbol: "Al", name: "Aluminum", atomicNumber: 13, category: "post-transition metal", color: "#bfa6a6" },
-    { id: "si", symbol: "Si", name: "Silicon", atomicNumber: 14, category: "metalloid", color: "#f0c8a0" },
-    { id: "p", symbol: "P", name: "Phosphorus", atomicNumber: 15, category: "nonmetal", color: "#ff8000" },
-    { id: "s", symbol: "S", name: "Sulfur", atomicNumber: 16, category: "nonmetal", color: "#ffff30" },
-    { id: "cl", symbol: "Cl", name: "Chlorine", atomicNumber: 17, category: "halogen", color: "#1ff01f" },
-    { id: "ar", symbol: "Ar", name: "Argon", atomicNumber: 18, category: "noble gas", color: "#80d1e3" },
-    
-    // Period 4
-    { id: "k", symbol: "K", name: "Potassium", atomicNumber: 19, category: "alkali metal", color: "#8f40d4" },
-    { id: "ca", symbol: "Ca", name: "Calcium", atomicNumber: 20, category: "alkaline earth metal", color: "#3dff00" },
-    { id: "sc", symbol: "Sc", name: "Scandium", atomicNumber: 21, category: "transition metal", color: "#e6e6e6" },
-    { id: "ti", symbol: "Ti", name: "Titanium", atomicNumber: 22, category: "transition metal", color: "#bfc2c7" },
-    { id: "v", symbol: "V", name: "Vanadium", atomicNumber: 23, category: "transition metal", color: "#a6a6ab" },
-    { id: "cr", symbol: "Cr", name: "Chromium", atomicNumber: 24, category: "transition metal", color: "#8a99c7" },
-    { id: "mn", symbol: "Mn", name: "Manganese", atomicNumber: 25, category: "transition metal", color: "#9c7ac7" },
-    { id: "fe", symbol: "Fe", name: "Iron", atomicNumber: 26, category: "transition metal", color: "#e06633" },
-    { id: "co", symbol: "Co", name: "Cobalt", atomicNumber: 27, category: "transition metal", color: "#f090a0" },
-    { id: "ni", symbol: "Ni", name: "Nickel", atomicNumber: 28, category: "transition metal", color: "#50d050" },
-    { id: "cu", symbol: "Cu", name: "Copper", atomicNumber: 29, category: "transition metal", color: "#c88033" },
-    { id: "zn", symbol: "Zn", name: "Zinc", atomicNumber: 30, category: "transition metal", color: "#7d80b0" },
-    { id: "ga", symbol: "Ga", name: "Gallium", atomicNumber: 31, category: "post-transition metal", color: "#c28f8f" },
-    { id: "ge", symbol: "Ge", name: "Germanium", atomicNumber: 32, category: "metalloid", color: "#668f8f" },
-    { id: "as", symbol: "As", name: "Arsenic", atomicNumber: 33, category: "metalloid", color: "#bd80e3" },
-    { id: "se", symbol: "Se", name: "Selenium", atomicNumber: 34, category: "nonmetal", color: "#ffa100" },
-    { id: "br", symbol: "Br", name: "Bromine", atomicNumber: 35, category: "halogen", color: "#a62929" },
-    { id: "kr", symbol: "Kr", name: "Krypton", atomicNumber: 36, category: "noble gas", color: "#5cb8d1" },
-    
-    // Period 5 (selected elements)
-    { id: "rb", symbol: "Rb", name: "Rubidium", atomicNumber: 37, category: "alkali metal", color: "#702eb0" },
-    { id: "sr", symbol: "Sr", name: "Strontium", atomicNumber: 38, category: "alkaline earth metal", color: "#00ff00" },
-    { id: "ag", symbol: "Ag", name: "Silver", atomicNumber: 47, category: "transition metal", color: "#c0c0c0" },
-    { id: "cd", symbol: "Cd", name: "Cadmium", atomicNumber: 48, category: "transition metal", color: "#ffd98f" },
-    { id: "in", symbol: "In", name: "Indium", atomicNumber: 49, category: "post-transition metal", color: "#a67573" },
-    { id: "sn", symbol: "Sn", name: "Tin", atomicNumber: 50, category: "post-transition metal", color: "#668080" },
-    { id: "sb", symbol: "Sb", name: "Antimony", atomicNumber: 51, category: "metalloid", color: "#9e63b5" },
-    { id: "te", symbol: "Te", name: "Tellurium", atomicNumber: 52, category: "metalloid", color: "#d47a00" },
-    { id: "i", symbol: "I", name: "Iodine", atomicNumber: 53, category: "halogen", color: "#940094" },
-    { id: "xe", symbol: "Xe", name: "Xenon", atomicNumber: 54, category: "noble gas", color: "#429eb0" },
-    
-    // Period 6 (selected elements)
-    { id: "cs", symbol: "Cs", name: "Cesium", atomicNumber: 55, category: "alkali metal", color: "#57178f" },
-    { id: "ba", symbol: "Ba", name: "Barium", atomicNumber: 56, category: "alkaline earth metal", color: "#00c900" },
-    { id: "pt", symbol: "Pt", name: "Platinum", atomicNumber: 78, category: "transition metal", color: "#d0d0e0" },
-    { id: "au", symbol: "Au", name: "Gold", atomicNumber: 79, category: "transition metal", color: "#ffd123" },
-    { id: "hg", symbol: "Hg", name: "Mercury", atomicNumber: 80, category: "transition metal", color: "#b8b8d0" },
-    { id: "tl", symbol: "Tl", name: "Thallium", atomicNumber: 81, category: "post-transition metal", color: "#a6544d" },
-    { id: "pb", symbol: "Pb", name: "Lead", atomicNumber: 82, category: "post-transition metal", color: "#575961" },
-    { id: "bi", symbol: "Bi", name: "Bismuth", atomicNumber: 83, category: "post-transition metal", color: "#9e4fb5" },
-    
-    // Period 7 (selected elements)
-    { id: "rn", symbol: "Rn", name: "Radon", atomicNumber: 86, category: "noble gas", color: "#428296" },
-    { id: "ra", symbol: "Ra", name: "Radium", atomicNumber: 88, category: "alkaline earth metal", color: "#007d00" },
+  const elements = [
+    { id: "h", symbol: "H", name: "Hydrogen", atomicNumber: 1, category: "nonmetal", color: "#ffffff", grade: ["6-8", "9-10", "11-12"] },
+    { id: "he", symbol: "He", name: "Helium", atomicNumber: 2, category: "noble gas", color: "#d9ffff", grade: ["6-8", "9-10", "11-12"] },
+    { id: "c", symbol: "C", name: "Carbon", atomicNumber: 6, category: "nonmetal", color: "#909090", grade: ["6-8", "9-10", "11-12"] },
+    { id: "n", symbol: "N", name: "Nitrogen", atomicNumber: 7, category: "nonmetal", color: "#3050f8", grade: ["6-8", "9-10", "11-12"] },
+    { id: "o", symbol: "O", name: "Oxygen", atomicNumber: 8, category: "nonmetal", color: "#ff0d0d", grade: ["6-8", "9-10", "11-12"] },
+    { id: "na", symbol: "Na", name: "Sodium", atomicNumber: 11, category: "alkali metal", color: "#ab5cf2", grade: ["6-8", "9-10", "11-12"] },
+    { id: "mg", symbol: "Mg", name: "Magnesium", atomicNumber: 12, category: "alkaline earth metal", color: "#8aff00", grade: ["6-8", "9-10", "11-12"] },
+    { id: "al", symbol: "Al", name: "Aluminum", atomicNumber: 13, category: "post-transition metal", color: "#bfa6a6", grade: ["6-8", "9-10", "11-12"] },
+    { id: "si", symbol: "Si", name: "Silicon", atomicNumber: 14, category: "metalloid", color: "#f0c8a0", grade: ["6-8", "9-10", "11-12"] },
+    { id: "p", symbol: "P", name: "Phosphorus", atomicNumber: 15, category: "nonmetal", color: "#ff8000", grade: ["6-8", "9-10", "11-12"] },
+    { id: "s", symbol: "S", name: "Sulfur", atomicNumber: 16, category: "nonmetal", color: "#ffff30", grade: ["6-8", "9-10", "11-12"] },
+    { id: "cl", symbol: "Cl", name: "Chlorine", atomicNumber: 17, category: "halogen", color: "#1ff01f", grade: ["6-8", "9-10", "11-12"] },
+    { id: "k", symbol: "K", name: "Potassium", atomicNumber: 19, category: "alkali metal", color: "#8f40d4", grade: ["6-8", "9-10", "11-12"] },
+    { id: "ca", symbol: "Ca", name: "Calcium", atomicNumber: 20, category: "alkaline earth metal", color: "#3dff00", grade: ["6-8", "9-10", "11-12"] },
+    { id: "fe", symbol: "Fe", name: "Iron", atomicNumber: 26, category: "transition metal", color: "#e06633", grade: ["6-8", "9-10", "11-12"] },
+    { id: "cu", symbol: "Cu", name: "Copper", atomicNumber: 29, category: "transition metal", color: "#c88033", grade: ["6-8", "9-10", "11-12"] },
+    { id: "zn", symbol: "Zn", name: "Zinc", atomicNumber: 30, category: "transition metal", color: "#7d80b0", grade: ["6-8", "9-10", "11-12"] },
+    { id: "ag", symbol: "Ag", name: "Silver", atomicNumber: 47, category: "transition metal", color: "#c0c0c0", grade: ["6-8", "9-10", "11-12"] },
+    { id: "au", symbol: "Au", name: "Gold", atomicNumber: 79, category: "transition metal", color: "#ffd123", grade: ["6-8", "9-10", "11-12"] },
   ];
 
-  const compounds: Compound[] = [
-    // Common laboratory compounds
-    { id: "h2o", formula: "H₂O", name: "Water", color: "#87ceeb", type: "molecular" },
-    { id: "hcl", formula: "HCl", name: "Hydrochloric Acid", color: "#ffff99", type: "acid" },
-    { id: "naoh", formula: "NaOH", name: "Sodium Hydroxide", color: "#ffffff", type: "base" },
-    { id: "h2so4", formula: "H₂SO₄", name: "Sulfuric Acid", color: "#ffcc99", type: "acid" },
-    { id: "hno3", formula: "HNO₃", name: "Nitric Acid", color: "#ffddaa", type: "acid" },
-    { id: "nh3", formula: "NH₃", name: "Ammonia", color: "#66ccff", type: "base" },
-    { id: "koh", formula: "KOH", name: "Potassium Hydroxide", color: "#f0f0f0", type: "base" },
-    
-    // Salts
-    { id: "nacl", formula: "NaCl", name: "Sodium Chloride", color: "#ffffff", type: "salt" },
-    { id: "caco3", formula: "CaCO₃", name: "Calcium Carbonate", color: "#f5f5f5", type: "salt" },
-    { id: "agno3", formula: "AgNO₃", name: "Silver Nitrate", color: "#f0f0f0", type: "salt" },
-    { id: "ki", formula: "KI", name: "Potassium Iodide", color: "#ffccff", type: "salt" },
-    { id: "kcl", formula: "KCl", name: "Potassium Chloride", color: "#ffffff", type: "salt" },
-    { id: "mgso4", formula: "MgSO₄", name: "Magnesium Sulfate", color: "#f8f8ff", type: "salt" },
-    { id: "caso4", formula: "CaSO₄", name: "Calcium Sulfate", color: "#ffffff", type: "salt" },
-    { id: "na2co3", formula: "Na₂CO₃", name: "Sodium Carbonate", color: "#f5f5f5", type: "salt" },
-    { id: "nahco3", formula: "NaHCO₃", name: "Sodium Bicarbonate", color: "#ffffff", type: "salt" },
-    
-    // Organic compounds
-    { id: "ch4", formula: "CH₄", name: "Methane", color: "#cccccc", type: "molecular" },
-    { id: "c2h6", formula: "C₂H₆", name: "Ethane", color: "#d3d3d3", type: "molecular" },
-    { id: "c2h4", formula: "C₂H₄", name: "Ethylene", color: "#dcdcdc", type: "molecular" },
-    { id: "c2h2", formula: "C₂H₂", name: "Acetylene", color: "#e5e5e5", type: "molecular" },
-    { id: "c2h5oh", formula: "C₂H₅OH", name: "Ethanol (Alcohol)", color: "#f0f8ff", type: "alcohol" },
-    { id: "ch3oh", formula: "CH₃OH", name: "Methanol", color: "#e6f3ff", type: "alcohol" },
-    { id: "c2h5oc2h5", formula: "C₂H₅OC₂H₅", name: "Diethyl Ether", color: "#f5f5dc", type: "ether" },
-    { id: "ch3och3", formula: "CH₃OCH₃", name: "Dimethyl Ether", color: "#f0f8ff", type: "ether" },
-    { id: "ch3cooh", formula: "CH₃COOH", name: "Acetic Acid", color: "#fff8dc", type: "organic acid" },
-    { id: "c6h12o6", formula: "C₆H₁₂O₆", name: "Glucose", color: "#fffacd", type: "molecular" },
-    { id: "c6h6", formula: "C₆H₆", name: "Benzene", color: "#f5f5f5", type: "aromatic" },
-    
-    // Other important compounds
-    { id: "co2", formula: "CO₂", name: "Carbon Dioxide", color: "#e6e6e6", type: "molecular" },
-    { id: "co", formula: "CO", name: "Carbon Monoxide", color: "#dcdcdc", type: "molecular" },
-    { id: "h2o2", formula: "H₂O₂", name: "Hydrogen Peroxide", color: "#e6f3ff", type: "molecular" },
-    { id: "so2", formula: "SO₂", name: "Sulfur Dioxide", color: "#ffffe0", type: "molecular" },
-    { id: "no", formula: "NO", name: "Nitric Oxide", color: "#ffefd5", type: "molecular" },
-    { id: "no2", formula: "NO₂", name: "Nitrogen Dioxide", color: "#ffa07a", type: "molecular" },
-    { id: "h2s", formula: "H₂S", name: "Hydrogen Sulfide", color: "#ffff99", type: "molecular" },
-    { id: "pcl3", formula: "PCl₃", name: "Phosphorus Trichloride", color: "#f0f8ff", type: "molecular" },
-    { id: "ccl4", formula: "CCl₄", name: "Carbon Tetrachloride", color: "#e6e6fa", type: "molecular" },
+  const compounds = [
+    { id: "h2o", formula: "H₂O", name: "Water", color: "#87ceeb", type: "molecular", grade: ["6-8", "9-10", "11-12"] },
+    { id: "co2", formula: "CO₂", name: "Carbon Dioxide", color: "#e6e6e6", type: "molecular", grade: ["6-8", "9-10", "11-12"] },
+    { id: "o2", formula: "O₂", name: "Oxygen Gas", color: "#ff6b6b", type: "molecular", grade: ["6-8", "9-10", "11-12"] },
+    { id: "nacl", formula: "NaCl", name: "Sodium Chloride (Salt)", color: "#ffffff", type: "salt", grade: ["6-8", "9-10", "11-12"] },
+    { id: "h2", formula: "H₂", name: "Hydrogen Gas", color: "#e6e6fa", type: "molecular", grade: ["6-8", "9-10", "11-12"] },
+    { id: "hcl", formula: "HCl", name: "Hydrochloric Acid", color: "#ffff99", type: "acid", grade: ["9-10", "11-12"] },
+    { id: "naoh", formula: "NaOH", name: "Sodium Hydroxide", color: "#ffffff", type: "base", grade: ["9-10", "11-12"] },
+    { id: "nh3", formula: "NH₃", name: "Ammonia", color: "#66ccff", type: "base", grade: ["6-8", "9-10", "11-12"] },
+    { id: "ch4", formula: "CH₄", name: "Methane", color: "#cccccc", type: "molecular", grade: ["6-8", "9-10", "11-12"] },
+    { id: "c2h5oh", formula: "C₂H₅OH", name: "Ethanol", color: "#f0f8ff", type: "alcohol", grade: ["11-12"] },
   ];
 
-  const filteredElements = elements.filter(element =>
-    element.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    element.symbol.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getGradeBadgeColor = (grade: string) => {
+    switch (grade) {
+      case "6-8": return "bg-green-100 text-green-800 hover:bg-green-200";
+      case "9-10": return "bg-blue-100 text-blue-800 hover:bg-blue-200";
+      case "11-12": return "bg-purple-100 text-purple-800 hover:bg-purple-200";
+      default: return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+    }
+  };
 
-  const filteredCompounds = compounds.filter(compound =>
-    compound.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    compound.formula.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredElements = elements.filter(element => {
+    const matchesSearch = element.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         element.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         element.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGrade = selectedGrade === "all" || element.grade.includes(selectedGrade);
+    return matchesSearch && matchesGrade;
+  });
 
-  const handleDragStart = (e: React.DragEvent, item: Element | Compound, type: 'element' | 'compound') => {
-    e.dataTransfer.setData('application/json', JSON.stringify({ item, type }));
+  const filteredCompounds = compounds.filter(compound => {
+    const matchesSearch = compound.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         compound.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         compound.type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGrade = selectedGrade === "all" || compound.grade.includes(selectedGrade);
+    return matchesSearch && matchesGrade;
+  });
+
+  const handleDragStart = (e: React.DragEvent, item: Element | Compound, type: string) => {
+    e.dataTransfer.setData('application/json', JSON.stringify({
+      ...item,
+      type: type
+    }));
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'nonmetal':
+      case 'halogen':
+        return <Sparkles className="h-3 w-3" />;
+      case 'alkali metal':
+      case 'alkaline earth metal':
+      case 'transition metal':
+      case 'post-transition metal':
+        return <Atom className="h-3 w-3" />;
+      case 'noble gas':
+        return <div className="h-3 w-3 rounded-full bg-blue-300" />;
+      case 'metalloid':
+        return <div className="h-3 w-3 bg-yellow-400 transform rotate-45" />;
+      default:
+        return <Atom className="h-3 w-3" />;
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'acid':
+        return <div className="h-3 w-3 bg-red-400 rounded-full" />;
+      case 'base':
+        return <div className="h-3 w-3 bg-blue-400 rounded-full" />;
+      case 'salt':
+        return <div className="h-3 w-3 bg-gray-300 rounded" />;
+      case 'molecular':
+        return <Beaker className="h-3 w-3" />;
+      case 'alcohol':
+      case 'organic':
+        return <div className="h-3 w-3 bg-green-400 rounded-full" />;
+      default:
+        return <Beaker className="h-3 w-3" />;
+    }
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="h-full bg-white/90 backdrop-blur-sm shadow-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <Atom className="h-5 w-5" />
           Chemical Library
         </CardTitle>
+        
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search elements & compounds..."
+            placeholder="Search elements or compounds..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-9"
           />
         </div>
+
+        <div className="flex flex-wrap gap-1">
+          <Badge
+            variant={selectedGrade === "all" ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setSelectedGrade("all")}
+          >
+            All Levels
+          </Badge>
+          <Badge
+            variant={selectedGrade === "6-8" ? "default" : "outline"}
+            className={`cursor-pointer ${getGradeBadgeColor("6-8")}`}
+            onClick={() => setSelectedGrade("6-8")}
+          >
+            <GraduationCap className="h-3 w-3 mr-1" />
+            6-8
+          </Badge>
+          <Badge
+            variant={selectedGrade === "9-10" ? "default" : "outline"}
+            className={`cursor-pointer ${getGradeBadgeColor("9-10")}`}
+            onClick={() => setSelectedGrade("9-10")}
+          >
+            <GraduationCap className="h-3 w-3 mr-1" />
+            9-10
+          </Badge>
+          <Badge
+            variant={selectedGrade === "11-12" ? "default" : "outline"}
+            className={`cursor-pointer ${getGradeBadgeColor("11-12")}`}
+            onClick={() => setSelectedGrade("11-12")}
+          >
+            <GraduationCap className="h-3 w-3 mr-1" />
+            11-12
+          </Badge>
+        </div>
       </CardHeader>
+
       <CardContent className="p-0">
-        <Tabs defaultValue="elements" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mx-4">
-            <TabsTrigger value="elements">Elements</TabsTrigger>
-            <TabsTrigger value="compounds">Compounds</TabsTrigger>
+        <Tabs defaultValue="elements" className="h-full w-[290px]">
+          <TabsList className="grid w-full grid-cols-2 mx-1">
+            <TabsTrigger value="elements" className="flex items-center gap-2">
+              <Atom className="h-4 w-4" />
+              Elements ({filteredElements.length})
+            </TabsTrigger>
+            <TabsTrigger value="compounds" className="flex items-center gap-21">
+              <Beaker className="h-4 w-4" />
+              Compounds ({filteredCompounds.length})
+            </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="elements" className="m-0">
-            <ScrollArea className="h-[500px] px-4">
-              <div className="space-y-2 py-2">
+
+          <TabsContent value="elements" className="mt-4 px-4">
+            <ScrollArea className="h-96">
+              <div className="space-y-2">
                 {filteredElements.map((element) => (
                   <div
                     key={element.id}
-                    className="element-card"
+                    className="w-[200px]flex items-center justify-between p-3 border rounded-lg bg-white hover:bg-gray-50 cursor-move transition-colors"
                     draggable
-                    onClick={() => onAddElement(element)}
                     onDragStart={(e) => handleDragStart(e, element, 'element')}
+                    onClick={() => onAddElement(element)}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-8 h-8 rounded border-2 border-border flex items-center justify-center text-xs font-bold"
-                          style={{ backgroundColor: element.color, color: element.color === '#ffffff' ? '#000' : '#fff' }}
-                        >
-                          {element.symbol}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{element.name}</div>
-                          <div className="text-xs text-muted-foreground">#{element.atomicNumber}</div>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded border-2 flex items-center justify-center text-xs font-bold"
+                        style={{ 
+                          backgroundColor: element.color,
+                          color: element.color === '#ffffff' ? '#000000' : '#000000',
+                          borderColor: element.color === '#ffffff' ? '#e2e8f0' : element.color
+                        }}
+                      >
+                        {element.symbol}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{element.name}</div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {getCategoryIcon(element.category)}
+                          <span>{element.category}</span>
+                          <span>•</span>
+                          <span>#{element.atomicNumber}</span>
                         </div>
                       </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {element.grade.map((grade) => (
+                        <Badge
+                          key={grade}
+                          variant="outline"
+                          className={`text-xs ${getGradeBadgeColor(grade)}`}
+                        >
+                          {grade}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
             </ScrollArea>
           </TabsContent>
-          
-          <TabsContent value="compounds" className="m-0">
-            <ScrollArea className="h-[500px] px-4">
-              <div className="space-y-2 py-2">
+
+          <TabsContent value="compounds" className="mt-4 px-4">
+            <ScrollArea className="h-96">
+              <div className="space-y-2">
                 {filteredCompounds.map((compound) => (
                   <div
                     key={compound.id}
-                    className="element-card"
+                    className="flex items-center justify-between p-3 border rounded-lg bg-white hover:bg-gray-50 cursor-move transition-colors"
                     draggable
-                    onClick={() => onAddCompound(compound)}
                     onDragStart={(e) => handleDragStart(e, compound, 'compound')}
+                    onClick={() => onAddCompound(compound)}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-8 h-8 rounded border-2 border-border flex items-center justify-center"
-                          style={{ backgroundColor: compound.color }}
-                        >
-                          <Beaker className="h-4 w-4 text-foreground" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{compound.name}</div>
-                          <div className="text-xs text-muted-foreground">{compound.formula}</div>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded border-2 flex items-center justify-center text-xs font-bold"
+                        style={{ 
+                          backgroundColor: compound.color,
+                          color: compound.color === '#ffffff' ? '#000000' : '#000000',
+                          borderColor: compound.color === '#ffffff' ? '#e2e8f0' : compound.color
+                        }}
+                      >
+                        {compound.formula.slice(0, 3)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{compound.name}</div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {getTypeIcon(compound.type)}
+                          <span>{compound.type}</span>
                         </div>
                       </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {compound.grade.map((grade) => (
+                        <Badge
+                          key={grade}
+                          variant="outline"
+                          className={`text-xs ${getGradeBadgeColor(grade)}`}
+                        >
+                          {grade}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -232,6 +300,36 @@ export const ElementLibrary = ({ onAddElement, onAddCompound }: ElementLibraryPr
             </ScrollArea>
           </TabsContent>
         </Tabs>
+
+        <div className="p-4 border-t bg-gray-50/50">
+          <div className="text-xs font-medium text-muted-foreground mb-2">Quick Add:</div>
+          <div className="flex flex-wrap gap-1">
+            <button
+              onClick={() => onAddCompound({ id: "h2o", formula: "H₂O", name: "Water", color: "#87ceeb", type: "molecular" })}
+              className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+            >
+              H₂O
+            </button>
+            <button
+              onClick={() => onAddElement({ id: "na", symbol: "Na", name: "Sodium", atomicNumber: 11, category: "alkali metal", color: "#ab5cf2" })}
+              className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded transition-colors"
+            >
+              Na
+            </button>
+            <button
+              onClick={() => onAddCompound({ id: "hcl", formula: "HCl", name: "Hydrochloric Acid", color: "#ffff99", type: "acid" })}
+              className="px-2 py-1 text-xs bg-yellow-100 hover:bg-yellow-200 rounded transition-colors"
+            >
+              HCl
+            </button>
+            <button
+              onClick={() => onAddElement({ id: "o", symbol: "O", name: "Oxygen", atomicNumber: 8, category: "nonmetal", color: "#ff0d0d" })}
+              className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded transition-colors"
+            >
+              O₂
+            </button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
